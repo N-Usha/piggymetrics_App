@@ -7,6 +7,12 @@ jobs:
   - job: MavenBuild
     steps:
     - task: Maven@3
+      displayName: 'Maven Compile'
+      inputs:
+        goals: compile
+        options: '-Dmaven.test.skip=true'
+        publishJUnitResults: false
+    - task: Maven@3
       displayName: 'Maven $(mavenPOMFile)'
       inputs:
         mavenPomFile: pom.xml
@@ -23,7 +29,7 @@ jobs:
       inputs:
         PathtoPublish: '$(build.artifactstagingdirectory)'
   
-  - job: Deploy
+  - job: Deploy account-service
     dependsOn: MavenBuild
     steps:
     - task: DownloadBuildArtifacts@0
@@ -31,9 +37,9 @@ jobs:
       inputs:
         artifactName: drop
     - task: AzureWebApp@1
-      displayName: 'Azure Web App Deploy: LinuxTomcatApp'
+      displayName: 'Azure Web App Deploy: piggymetrics-account-service'
       inputs:
         azureSubscription: 'JavaSpring - Service Endpoint'
         appType: webAppLinux
-        appName: LinuxTomcatApp
-        package: '$(build.artifactstagingdirectory)/**/piggymetrics 1.0-SNAPSHOT.jar'
+        appName: piggymetrics-account-service
+        package: '$(build.artifactstagingdirectory)/**/account-service-1.0-SNAPSHOT.jar'
