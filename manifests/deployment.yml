@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: piggymetrics 
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: piggymetrics 
+    spec:
+      containers:
+        - name: piggymetrics 
+          image: usharegistry.azurecr.io/piggymetrics 
+          ports:
+          - containerPort: 6000
