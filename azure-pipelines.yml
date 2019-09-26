@@ -31,24 +31,18 @@ stages:
       vmImage: $(vmImageName)
     steps:
     - task: Maven@3
-      displayName: 'Maven Compile'
-      inputs:
-        goals: compile
-        options: '-Dmaven.test.skip=true'
-        publishJUnitResults: false
-    - task: Maven@3
       displayName: 'Maven $(mavenPOMFile)'
       inputs:
-        mavenPomFile: pom.xml
+        mavenPomFile: 'pom.xml'
+        options: '[-DskipTests]'
+
     - task: DockerCompose@0
       inputs:
-        containerregistrytype: 'Azure Container Registry'
-        azureSubscription: 'RMPM'
-        azureContainerRegistry: '{"loginServer":"usharegistry.azurecr.io", "id" : "/subscriptions/afc11291-9826-46be-b852-70349146ddf8/resourceGroups/Usha_DND/providers/Microsoft.ContainerRegistry/registries/usharegistry"}'
+        containerregistrytype: 'Container Registry'
         dockerComposeFile: '**/docker-compose.yml'
         action: 'Run a Docker Compose command'
         dockerComposeCommand: 'up'
-        arguments: '-f docker-compose.yml -f docker-compose.dev.yml'
+        #arguments: '-f docker-compose.yml -f docker-compose.dev.yml'
           
     - upload: manifests
       artifact: manifests
