@@ -1,0 +1,49 @@
+on: [push]
+
+name: Build and deploy to Azure Kubernetes Service (AKS)
+
+jobs:
+
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Docker login using azure/docker-login@v1 action
+      uses: azure/docker-login@v1
+      with:
+        login-server: usharegistry.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - name: Docker build
+      run: |
+        docker build . -t usharegistry.azurecr.io/aksdemo:${{ github.sha }}
+        docker push usharegistry.azurecr.io/aksdemo:${{ github.sha }} 
+      
+    - name: Set Context for Azure Kubernetes Cluster using azure/aks-set-context@v1 action
+      uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: usha-aks
+        resource-group: usha_dnd
+
+    - name: Create secret in Kubernetes Cluster using azure/k8s-create-secret@v1 action
+      uses: azure/k8s-create-secret@v1
+      with:
+        container-registry-url: usharegistry.azurecr.io
+        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: demo-e2e-secret
+    
+    - name: Deploy manifests to Kubernetes cluster using Azure/k8s-deploy@v1 action
+      uses: Azure/k8s-deploy@v1
+      with:
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          usharegistry.azurecr.io/aksdemo:${{ github.sha }}
+        imagepullsecrets: |
+          demo-e2e-secret
