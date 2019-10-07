@@ -39,7 +39,7 @@ jobs:
     - task: AzureWebApp@1
       displayName: 'Azure Web App Deploy: piggymetricsAccountService'
       inputs:
-        azureSubscription: 'JavaSpring - Service Endpoint'
+        azureSubscription: 'RMPM (afc11291-9826-46be-b852-70349146ddf8)'
         appType: webAppLinux
         appName: piggymetrics-account-service
         package: '$(build.artifactstagingdirectory)/**/account-service-1.0-SNAPSHOT.jar'
