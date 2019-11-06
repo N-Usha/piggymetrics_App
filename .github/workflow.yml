@@ -1,6 +1,6 @@
 on: [push]
 
-name: Build and deploy to Azure Kubernetes Service (AKS)
+name: Build and deploy Piggy App to Azure Kubernetes Service (AKS)
 
 jobs:
 
